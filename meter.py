@@ -1,3 +1,7 @@
+from PIL import Image
+
+Image.CUBIC = Image.BICUBIC
+
 #! calculate time || hour/minute/seconds
 # def update_meter(self):
 #     self.percentage
