@@ -11,14 +11,13 @@ class TimerWindow:
 
         self._setup_window()
         self._create_widgets()
-        self._convert_seconds()
 
-        self.update_meter()
+        self._update_meter()
 
     def _setup_window(self):
         screenwidth = self.root.winfo_screenwidth()
         screenheight = self.root.winfo_screenheight()
-        x = int((screenwidth - self.window_width) / 2)
+        x = int((screenwidth - self.window_width) // 2)
         y = int((screenheight - self.window_height) / 2) - 100
 
         self.root.geometry(f"{self.window_width}x{self.window_height}+{x}+{y}")
@@ -41,13 +40,7 @@ class TimerWindow:
         )
         self.progress_bar.pack()
 
-    def _convert_seconds(self):
-        total = self.time_remaining
-        hours, remainder = divmod(total, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        self.timer_label.config(text=f"{hours:02d}:{minutes:02d}:{seconds:02d}")
-
-    def update_meter(self):
+    def _update_meter(self):
         total = self.time_remaining
         hours, remainder = divmod(total, 3600)
         minutes, seconds = divmod(remainder, 60)
@@ -58,15 +51,18 @@ class TimerWindow:
             time_elapsed = self.total_duration - total
 
             # * mapping time from 0 - 100
-            progress_percentage = (time_elapsed / self.total_duration) * 100
+            normalized_percentage = (time_elapsed / self.total_duration) * 100
+            # * reversing to --> 100 - 0
+            current_percentage = 100 - normalized_percentage
         else:
-            progress_percentage = 100
+            current_percentage = 0
 
-        self.progress_bar["value"] = progress_percentage
+        self.progress_bar["value"] = current_percentage
 
         if self.time_remaining > 0:
             self.time_remaining -= 1
             # * runs every 1 sec
-            self.root.after(1000, self.update_meter)
+            self.root.after(1000, self._update_meter)
         else:
             self.timer_label.config(text="Time's Up!", bootstyle="danger")
+            self.root.destroy()
