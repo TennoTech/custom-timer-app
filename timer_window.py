@@ -5,11 +5,10 @@ from meter_window import TimerWindow
 
 
 class MainWindow:
-    timer_value = 0
-
     def __init__(self):
-        self.root = ttkb.Window(themename="darkly")
+        self.timer_value = 0
         self.window_width, self.window_height = 500, 400
+        self.root = ttkb.Window(themename="darkly")
 
         self._setup_window()
         self._create_widgets()
@@ -54,7 +53,6 @@ class MainWindow:
         ).pack(pady=10)
 
     def on_submit(self, event=None):
-        # TODO -- make where it can auto grab value when onclicked
         val = self.user_input.get()
         if val.isdigit() and int(val) > 0:
             self.timer_value = int(val)
@@ -62,8 +60,8 @@ class MainWindow:
             # * temp retire this window
             self.root.withdraw()
             # *  secondary window attached to the main root
+            # *  transferring main window to secondary one
             new_window = ttkb.Toplevel(self.root)
             TimerWindow(new_window, self.timer_value)
         else:
-            print("Error: Please enter numbers only!")
             self.input_validator_tip.show_error("Error: Please enter numbers only!")

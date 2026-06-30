@@ -1,8 +1,5 @@
 import ttkbootstrap as ttkb
 from ttkbootstrap.constants import *
-from PIL import Image
-
-Image.CUBIC = Image.BICUBIC
 
 
 class TimerWindow:
@@ -17,7 +14,6 @@ class TimerWindow:
         self._convert_seconds()
 
         self.update_meter()
-        # self.root.update_idletasks()
 
     def _setup_window(self):
         screenwidth = self.root.winfo_screenwidth()
@@ -58,10 +54,10 @@ class TimerWindow:
         self.timer_label.config(text=f"{hours:02d}:{minutes:02d}:{seconds:02d}")
 
         if self.total_duration > 0:
-            # * Calculate how many seconds have already passed
+            # * calculating how many seconds have passed from original time
             time_elapsed = self.total_duration - total
 
-            # * Map time_elapsed to the 0-100 range
+            # * mapping time from 0 - 100
             progress_percentage = (time_elapsed / self.total_duration) * 100
         else:
             progress_percentage = 100
@@ -70,7 +66,7 @@ class TimerWindow:
 
         if self.time_remaining > 0:
             self.time_remaining -= 1
-            #* runs every 1 sec
+            # * runs every 1 sec
             self.root.after(1000, self.update_meter)
         else:
             self.timer_label.config(text="Time's Up!", bootstyle="danger")
