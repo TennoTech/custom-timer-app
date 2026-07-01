@@ -7,7 +7,7 @@ class TimerWindow:
         self.root = parent_window
         self.time_remaining = time_remaining
         self.total_duration = time_remaining
-        self.window_width, self.window_height = 500, 400
+        self.window_width, self.window_height = 150, 100
 
         self._setup_window()
         self._create_widgets()
@@ -15,16 +15,36 @@ class TimerWindow:
         self._update_meter()
 
     def _setup_window(self):
-        screenwidth = self.root.winfo_screenwidth()
-        screenheight = self.root.winfo_screenheight()
-        x = int((screenwidth - self.window_width) // 2)
-        y = int((screenheight - self.window_height) / 2) - 100
+        x = self.root.winfo_screenwidth()
+        y = self.root.winfo_screenheight()
 
-        self.root.geometry(f"{self.window_width}x{self.window_height}+{x}+{y}")
+        self.root.geometry(f"{self.window_width}x{self.window_height}+{800}+{400}")
         self.root.attributes("-topmost", True)
-        # self.root.overrideredirect(True)
+        self.root.overrideredirect(True)
 
     def _create_widgets(self):
+        self.title_bar = ttkb.Frame(self.root, bootstyle="primary")
+        self.title_bar.pack(fill=X, side=TOP)
+
+        style = ttkb.Style()
+        style.configure(
+            "TinyClose.danger-outline.TButton",
+            font=("Helvetica", 7),
+            padding=(2, 0),
+        )
+
+        self.close_btn = ttkb.Button(
+            self.title_bar,
+            text="✖",
+            style="TinyClose.danger-outline.TButton",
+            command=self.root.destroy,
+            width=2,
+        )
+        self.close_btn.pack(side=RIGHT, padx=0, pady=0)
+
+        self.root.bind("<ButtonPress-1>", self._start_drag)
+        self.root.bind("<B1-Motion>", self._drag_window)
+
         #!########## Title ###########
         self.timer_label = ttkb.Label(
             self.root,
@@ -39,6 +59,35 @@ class TimerWindow:
             self.root, bootstyle="info", value=0, maximum=100
         )
         self.progress_bar.pack()
+
+    def _start_drag(self, event):
+        # Record the mouse position relative to the title bar
+        self.x_offset = event.x
+        # Use winfo_y() to include title bar offset if it sits below anything else
+        self.y_offset = event.y
+
+    def _drag_window(self, event):
+        # 1. Calculate the intended new position
+        new_loc_x = self.root.winfo_x() + (event.x - self.x_offset)
+        new_loc_y = self.root.winfo_y() + (event.y - self.y_offset)
+
+        win_width = self.root.winfo_width()
+        win_height = self.root.winfo_height()
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+
+        #! clamp window to screen dimensions
+        if new_loc_x < 0:
+            new_loc_x = 0
+        elif new_loc_x > (screen_width - win_width):
+            new_loc_x = screen_width - win_width
+
+        if new_loc_y < 0:
+            new_loc_y = 0
+        elif new_loc_y > (screen_height - win_height):
+            new_loc_y = screen_height - win_height
+
+        self.root.geometry(f"+{new_loc_x}+{new_loc_y}")
 
     def _update_meter(self):
         total = self.time_remaining
@@ -65,4 +114,4 @@ class TimerWindow:
             self.root.after(1000, self._update_meter)
         else:
             self.timer_label.config(text="Time's Up!", bootstyle="danger")
-            self.root.destroy()
+            # self.root.destroy()
