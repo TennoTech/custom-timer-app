@@ -15,24 +15,25 @@ class TimerWindow:
         self._update_meter()
 
     def _setup_window(self):
-        x = self.root.winfo_screenwidth()
-        y = self.root.winfo_screenheight()
+        x = int(self.root.winfo_screenwidth() / 2)
+        y = int(self.root.winfo_screenheight() / 2) - self.window_height
 
-        self.root.geometry(f"{self.window_width}x{self.window_height}+{800}+{400}")
+        self.root.geometry(f"{self.window_width}x{self.window_height}+{x}+{y}")
         self.root.attributes("-topmost", True)
         self.root.overrideredirect(True)
 
     def _create_widgets(self):
+        #!########## Top Frame ###########
         self.title_bar = ttkb.Frame(self.root, bootstyle="primary")
         self.title_bar.pack(fill=X, side=TOP)
 
+        #!########## Exit Button ###########
         style = ttkb.Style()
         style.configure(
             "TinyClose.danger-outline.TButton",
             font=("Helvetica", 7),
             padding=(2, 0),
         )
-
         self.close_btn = ttkb.Button(
             self.title_bar,
             text="✖",
@@ -42,10 +43,11 @@ class TimerWindow:
         )
         self.close_btn.pack(side=RIGHT, padx=0, pady=0)
 
+        #!########## Binding Functions ###########
         self.root.bind("<ButtonPress-1>", self._start_drag)
         self.root.bind("<B1-Motion>", self._drag_window)
 
-        #!########## Title ###########
+        #!########## Timer Text ###########
         self.timer_label = ttkb.Label(
             self.root,
             bootstyle="info",
